@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Hero Roulette — Land of Dawn Draw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#090b11;
+    --bg-vign:#0d1018;
+    --panel:#12151f;
+    --panel-2:#171b28;
+    --card:#1b2030;
+    --border:rgba(205,164,94,.16);
+    --border-strong:rgba(205,164,94,.4);
+    --gold:#cda45e;
+    --gold-bright:#f2c879;
+    --emerald:#2bcf9e;
+    --violet:#8b7ae8;
+    --text:#ece7da;
+    --muted:#8891a6;
+    --muted-2:#5b6478;
+
+    --tank:#5a8fd9;
+    --fighter:#d4762f;
+    --assassin:#c23f66;
+    --mage:#7a6ae8;
+    --marksman:#2bcf9e;
+    --support:#e0b23c;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(205,164,94,.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 90% 100%, rgba(43,207,158,.06), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Rajdhani',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  .hex-fx{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    opacity:.35;
+    background-image:
+      repeating-linear-gradient(120deg, rgba(205,164,94,.035) 0 1px, transparent 1px 90px),
+      repeating-linear-gradient(60deg, rgba(205,164,94,.035) 0 1px, transparent 1px 90px);
+  }
+
+  .wrap{position:relative; z-index:1; max-width:880px; margin:0 auto; padding:32px 18px 60px;}
+
+  /* ---------- Header ---------- */
+  header{text-align:center; margin-bottom:28px;}
+  .eyebrow{
+    font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:.35em;
+    font-size:11px; color:var(--gold); text-transform:uppercase; opacity:.85;
+  }
+  .eyebrow::before, .eyebrow::after{content:"◆"; margin:0 10px; font-size:8px; color:var(--muted-2); vertical-align:middle;}
+  h1{
+    font-family:'Cinzel',serif; font-weight:900;
+    font-size:clamp(30px,7vw,50px);
+    margin:10px 0 6px;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold) 60%, #a9814c);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    letter-spacing:.03em;
+    text-shadow:0 0 40px rgba(205,164,94,.25);
+  }
+  .subtitle{color:var(--muted); font-size:15px; max-width:480px; margin:0 auto; line-height:1.5;}
+
+  /* ---------- Filters ---------- */
+  .filters{
+    background:linear-gradient(180deg,var(--panel),var(--panel-2));
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:18px 18px 20px;
+    margin-bottom:26px;
+  }
+  .filter-group{margin-bottom:14px;}
+  .filter-group:last-child{margin-bottom:0;}
+  .filter-label{
+    font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:9px; display:flex; align-items:center; gap:6px;
+  }
+  .filter-label .dot{width:6px;height:6px;border-radius:50%;background:var(--gold); box-shadow:0 0 8px var(--gold);}
+  .chip-row{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    appearance:none; border:1px solid var(--border); background:rgba(255,255,255,.02);
+    color:var(--muted); font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13.5px;
+    padding:7px 14px; border-radius:999px; cursor:pointer; letter-spacing:.02em;
+    transition:all .15s ease; user-select:none; white-space:nowrap;
+  }
+  .chip:hover{border-color:var(--border-strong); color:var(--text);}
+  .chip.active{
+    color:#100c05; font-weight:700;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold));
+    border-color:var(--gold-bright);
+    box-shadow:0 0 14px rgba(205,164,94,.35);
+  }
+  .chip[data-role].active{ background:var(--role-color,var(--gold)); color:#0a0c12; border-color:var(--role-color,var(--gold));
+    box-shadow:0 0 14px color-mix(in srgb, var(--role-color,var(--gold)) 55%, transparent);}
+
+  .pool-line{
+    display:flex; justify-content:space-between; align-items:center; margin-top:16px;
+    padding-top:14px; border-top:1px dashed var(--border); font-size:13px; color:var(--muted-2);
+  }
+  .pool-count{color:var(--emerald); font-weight:700; letter-spacing:.03em;}
+  .reset-link{background:none;border:none;color:var(--muted); font-family:'Rajdhani',sans-serif; font-weight:600; font-size:13px; cursor:pointer; text-decoration:underline; text-underline-offset:3px;}
+  .reset-link:hover{color:var(--gold);}
+
+  /* ---------- Stage ---------- */
+  .stage{display:flex; flex-direction:column; align-items:center; padding:8px 0 6px;}
+
+  .ring-wrap{position:relative; width:min(78vw,300px); height:min(78vw,300px); margin-bottom:22px;}
+  .ring-outer, .ring-inner{position:absolute; inset:0; border-radius:50%;}
+  .ring-outer{
+    border:1.5px dashed var(--border-strong);
+    animation:spin-slow 34s linear infinite;
+  }
+  .ring-outer::before, .ring-outer::after{
+    content:"◆"; position:absolute; color:var(--gold); font-size:10px;
+  }
+  .ring-outer::before{top:-6px; left:calc(50% - 5px);}
+  .ring-outer::after{bottom:-6px; left:calc(50% - 5px);}
+  .ring-inner{
+    inset:14px; border:1px solid rgba(43,207,158,.25);
+    animation:spin-slow-rev 26s linear infinite;
+  }
+  @keyframes spin-slow{ to{ transform:rotate(360deg);} }
+  @keyframes spin-slow-rev{ to{ transform:rotate(-360deg);} }
+
+  .portrait-frame{
+    position:absolute; inset:28px; border-radius:50%; overflow:hidden;
+    background:radial-gradient(circle at 35% 25%, #262c40, #12151f 75%);
+    border:2px solid var(--border-strong);
+    box-shadow:inset 0 0 30px rgba(0,0,0,.6), 0 0 0 6px rgba(205,164,94,.05);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .portrait-frame img{
+    width:100%; height:100%; object-fit:cover; display:none;
+    transition:opacity .05s linear, filter .05s linear;
+  }
+  .fallback-avatar{
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    font-family:'Cinzel',serif; font-weight:700; font-size:15px; text-align:center; padding:14px;
+    color:#fff; line-height:1.25; letter-spacing:.02em;
+    transition:opacity .05s linear, filter .05s linear;
+  }
+  .fallback-avatar small{display:block; font-family:'Rajdhani',sans-serif; font-weight:600; font-size:10px; letter-spacing:.15em; opacity:.75; margin-top:5px;}
+
+  .portrait-frame.flash img, .portrait-frame.flash .fallback-avatar{
+    opacity:.18; filter:brightness(2.4) saturate(1.4) blur(1px);
+  }
+  .portrait-frame.reveal{
+    animation:reveal-pulse .55s ease-out;
+  }
+  @keyframes reveal-pulse{
+    0%{box-shadow:inset 0 0 30px rgba(0,0,0,.6), 0 0 0 0 rgba(242,200,121,.7);}
+    60%{box-shadow:inset 0 0 30px rgba(0,0,0,.6), 0 0 0 16px rgba(242,200,121,0);}
+    100%{box-shadow:inset 0 0 30px rgba(0,0,0,.6), 0 0 0 6px rgba(205,164,94,.05);}
+  }
+
+  .idle-hint{
+    position:absolute; inset:28px; display:flex; align-items:center; justify-content:center;
+    text-align:center; font-family:'Cinzel',serif; color:var(--muted-2); font-size:12px;
+    letter-spacing:.1em; padding:20px; pointer-events:none;
+  }
+
+  /* ---------- Result ---------- */
+  .result-info{text-align:center; min-height:78px; margin-bottom:18px;}
+  .new-badge{
+    display:inline-block; font-size:10px; font-weight:700; letter-spacing:.14em;
+    color:#0a0c12; background:var(--emerald); border-radius:5px; padding:2px 7px; margin-bottom:6px;
+    vertical-align:middle;
+  }
+  .hero-name{
+    font-family:'Cinzel',serif; font-weight:700; font-size:26px; color:var(--text); letter-spacing:.02em;
+  }
+  .hero-tags{display:flex; gap:8px; justify-content:center; margin-top:9px; flex-wrap:wrap;}
+  .tag{
+    font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    padding:4px 11px; border-radius:999px; color:#0a0c12;
+  }
+  .tag.lane{background:rgba(255,255,255,.08); color:var(--text); border:1px solid var(--border-strong);}
+
+  .spin-btn{
+    font-family:'Cinzel',serif; font-weight:700; font-size:16px; letter-spacing:.12em;
+    color:#140f06; background:linear-gradient(180deg,var(--gold-bright),var(--gold) 65%, #a9814c);
+    border:none; border-radius:12px; padding:15px 46px; cursor:pointer;
+    box-shadow:0 6px 0 #7a5d33, 0 10px 24px rgba(205,164,94,.25);
+    transition:transform .08s ease, box-shadow .08s ease;
+    text-transform:uppercase;
+  }
+  .spin-btn:active{transform:translateY(4px); box-shadow:0 2px 0 #7a5d33, 0 4px 14px rgba(205,164,94,.2);}
+  .spin-btn:disabled{
+    background:linear-gradient(180deg,#4b4f5c,#333741); color:#8891a6; cursor:not-allowed;
+    box-shadow:0 6px 0 #23262e; opacity:.75;
+  }
+  .empty-warn{color:#e07a7a; font-size:13px; margin-top:12px; font-weight:600; display:none;}
+  .empty-warn.show{display:block;}
+
+  /* ---------- History ---------- */
+  .history{margin-top:38px;}
+  .history h3{
+    font-family:'Rajdhani',sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--muted); margin:0 0 12px; text-align:center;
+  }
+  .history-row{display:flex; gap:10px; overflow-x:auto; padding:4px 2px 10px; justify-content:flex-start; scrollbar-width:thin;}
+  .history-row:has(.hist-empty){justify-content:center;}
+  .hist-empty{color:var(--muted-2); font-size:13px; padding:10px;}
+  .hist-item{
+    flex:0 0 auto; width:56px; text-align:center;
+  }
+  .hist-portrait{
+    width:56px; height:56px; border-radius:50%; overflow:hidden; border:1.5px solid var(--border-strong);
+    background:radial-gradient(circle at 35% 25%, #262c40, #12151f 75%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hist-portrait img{width:100%; height:100%; object-fit:cover; display:none;}
+  .hist-fallback{
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    font-family:'Cinzel',serif; font-weight:700; font-size:11px; color:#fff;
+  }
+  .hist-name{font-size:10.5px; color:var(--muted); margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+  /* ---------- Footer ---------- */
+  footer{margin-top:44px; border-top:1px solid var(--border); padding-top:20px;}
+  details{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px 16px;
+  }
+  summary{
+    cursor:pointer; font-weight:700; font-size:13px; letter-spacing:.05em; color:var(--gold);
+    text-transform:uppercase; list-style:none;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"⚙ "; }
+  .setup-body{margin-top:12px; font-size:13.5px; color:var(--muted); line-height:1.65;}
+  .setup-body code{background:rgba(255,255,255,.06); padding:1px 6px; border-radius:5px; color:var(--emerald); font-size:12.5px;}
+  .foot-credit{text-align:center; color:var(--muted-2); font-size:12px; margin-top:18px; letter-spacing:.03em;}
+
+  @media (max-width:420px){
+    .spin-btn{padding:14px 34px; font-size:14.5px;}
+    .chip{font-size:13px; padding:6px 12px;}
+  }
+</style>
+</head>
+<body>
+<div class="hex-fx"></div>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Land of Dawn</div>
+    <h1>Hero Roulette</h1>
+    <p class="subtitle">Filter by lane or role, then draw. The wheel flickers through the pool before settling on your hero.</p>
+  </header>
+
+  <section class="filters">
+    <div class="filter-group">
+      <div class="filter-label"><span class="dot"></span>Lane</div>
+      <div class="chip-row" id="laneRow"></div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label"><span class="dot"></span>Role</div>
+      <div class="chip-row" id="roleRow"></div>
+    </div>
+    <div class="pool-line">
+      <span><span class="pool-count" id="poolCount">130</span> heroes in pool</span>
+      <button class="reset-link" id="resetBtn">reset filters</button>
+    </div>
+  </section>
+
+  <section class="stage">
+    <div class="ring-wrap">
+      <div class="ring-outer"></div>
+      <div class="ring-inner"></div>
+      <div class="portrait-frame" id="portraitFrame">
+        <img id="heroImg" alt="">
+        <div class="fallback-avatar" id="heroFallback" style="display:none;"></div>
+        <div class="idle-hint" id="idleHint">Press Draw<br>to Summon</div>
+      </div>
+    </div>
+
+    <div class="result-info" id="resultInfo">
+      <div class="hero-name" id="heroName">—</div>
+      <div class="hero-tags" id="heroTags"></div>
+    </div>
+
+    <button class="spin-btn" id="spinBtn">Draw Hero</button>
+    <div class="empty-warn" id="emptyWarn">No heroes match these filters — try widening your selection.</div>
+  </section>
+
+  <section class="history">
+    <h3>Recent Draws</h3>
+    <div class="history-row" id="historyRow"><span class="hist-empty">Your draw history will appear here</span></div>
+  </section>
+
+  <footer>
+    <details>
+      <summary>Using your own hero art</summary>
+      <div class="setup-body">
+        Every portrait is a placeholder right now — it falls back to a colored initial badge because no image file was found. To swap in real art, create a folder named <code>images</code> next to this HTML file, and drop in a photo for each hero named exactly like <code>images/hero-slug.jpg</code> (e.g. <code>images/hayabusa.jpg</code>, <code>images/yi-sun-shin.jpg</code>). The page will automatically pick it up — no code changes needed. JPG or PNG both work.
+      </div>
+    </details>
+    <p class="foot-credit">Fan-made hero draw tool · not affiliated with Moonton · roster current as of August 2026</p>
+  </footer>
+
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   HERO DATABASE — slug, name, role, lane, isNew (2025-2026)
+--------------------------------------------------------- */
+const HEROES = [
+["aamon","Aamon","assassin","jungle"],
+["akai","Akai","tank","roam"],
+["aldous","Aldous","fighter","exp"],
+["alice","Alice","mage","mid"],
+["alpha","Alpha","fighter","exp"],
+["alucard","Alucard","fighter","exp"],
+["angela","Angela","support","roam"],
+["argus","Argus","fighter","exp"],
+["arlott","Arlott","fighter","exp"],
+["atlas","Atlas","tank","roam"],
+["aulus","Aulus","fighter","exp"],
+["aurora","Aurora","mage","mid"],
+["badang","Badang","fighter","exp"],
+["balmond","Balmond","fighter","exp"],
+["bane","Bane","fighter","exp"],
+["barats","Barats","tank","roam"],
+["baxia","Baxia","tank","roam"],
+["beatrix","Beatrix","marksman","gold"],
+["belerick","Belerick","tank","roam"],
+["benedetta","Benedetta","assassin","jungle"],
+["brody","Brody","marksman","gold"],
+["bruno","Bruno","marksman","gold"],
+["carmilla","Carmilla","support","roam"],
+["cecilion","Cecilion","mage","mid"],
+["chang-e","Chang'e","mage","mid"],
+["chip","Chip","tank","roam"],
+["chou","Chou","fighter","exp"],
+["cici","Cici","fighter","exp"],
+["claude","Claude","marksman","gold"],
+["clint","Clint","marksman","gold"],
+["cyclops","Cyclops","mage","mid"],
+["diggie","Diggie","support","roam"],
+["dyrroth","Dyrroth","fighter","exp"],
+["edith","Edith","tank","roam"],
+["esmeralda","Esmeralda","support","roam"],
+["estes","Estes","support","roam"],
+["eudora","Eudora","mage","mid"],
+["fanny","Fanny","assassin","jungle"],
+["faramis","Faramis","support","roam"],
+["floryn","Floryn","support","roam"],
+["franco","Franco","tank","roam"],
+["fredrinn","Fredrinn","fighter","jungle"],
+["freya","Freya","fighter","exp"],
+["gatotkaca","Gatotkaca","tank","roam"],
+["gloo","Gloo","tank","exp"],
+["gord","Gord","mage","mid"],
+["granger","Granger","marksman","gold"],
+["grock","Grock","tank","exp"],
+["guinevere","Guinevere","fighter","mid"],
+["gusion","Gusion","assassin","jungle"],
+["hanabi","Hanabi","marksman","gold"],
+["hanzo","Hanzo","assassin","jungle"],
+["harith","Harith","mage","mid"],
+["harley","Harley","mage","mid"],
+["hayabusa","Hayabusa","assassin","jungle"],
+["helcurt","Helcurt","assassin","jungle"],
+["hilda","Hilda","fighter","jungle"],
+["hirara","Hirara","assassin","jungle","new"],
+["hylos","Hylos","tank","roam"],
+["irithel","Irithel","marksman","gold"],
+["ixia","Ixia","marksman","gold"],
+["jawhead","Jawhead","fighter","jungle"],
+["johnson","Johnson","tank","roam"],
+["joy","Joy","assassin","jungle"],
+["julian","Julian","fighter","exp"],
+["kadita","Kadita","assassin","jungle"],
+["kagura","Kagura","mage","mid"],
+["kaja","Kaja","tank","roam"],
+["kalea","Kalea","fighter","exp","new"],
+["karina","Karina","assassin","jungle"],
+["karrie","Karrie","marksman","gold"],
+["khaleed","Khaleed","fighter","exp"],
+["khufra","Khufra","tank","roam"],
+["kimmy","Kimmy","marksman","gold"],
+["lancelot","Lancelot","assassin","jungle"],
+["lapu-lapu","Lapu-Lapu","fighter","exp"],
+["layla","Layla","marksman","gold"],
+["lesley","Lesley","marksman","gold"],
+["ling","Ling","assassin","jungle"],
+["lolita","Lolita","support","roam"],
+["lukas","Lukas","fighter","exp"],
+["lunox","Lunox","mage","mid"],
+["luo-yi","Luo Yi","mage","mid"],
+["marcel","Marcel","support","roam","new"],
+["martis","Martis","fighter","exp"],
+["masha","Masha","fighter","exp"],
+["mathilda","Mathilda","support","roam"],
+["melissa","Melissa","marksman","gold"],
+["minotaur","Minotaur","tank","roam"],
+["minsitthar","Minsitthar","fighter","exp"],
+["miya","Miya","marksman","gold"],
+["moskov","Moskov","marksman","gold"],
+["nana","Nana","mage","mid"],
+["natalia","Natalia","assassin","jungle"],
+["natan","Natan","marksman","gold"],
+["nolan","Nolan","assassin","jungle"],
+["novaria","Novaria","mage","mid"],
+["obsidia","Obsidia","marksman","gold","new"],
+["odette","Odette","mage","mid"],
+["paquito","Paquito","fighter","exp"],
+["pharsa","Pharsa","mage","mid"],
+["popol-and-kupa","Popol and Kupa","marksman","gold"],
+["rafaela","Rafaela","support","roam"],
+["roger","Roger","fighter","jungle"],
+["ruby","Ruby","fighter","exp"],
+["saber","Saber","assassin","jungle"],
+["selena","Selena","mage","mid"],
+["silvanna","Silvanna","fighter","exp"],
+["sora","Sora","fighter","exp","new"],
+["sun","Sun","fighter","jungle"],
+["suyou","Suyou","assassin","jungle"],
+["terizla","Terizla","fighter","exp"],
+["thamuz","Thamuz","fighter","exp"],
+["tigreal","Tigreal","tank","roam"],
+["uranus","Uranus","tank","exp"],
+["vale","Vale","mage","mid"],
+["valentina","Valentina","mage","mid"],
+["valir","Valir","mage","mid"],
+["vexana","Vexana","mage","mid"],
+["wanwan","Wanwan","marksman","gold"],
+["x-borg","X.Borg","fighter","exp"],
+["xavier","Xavier","mage","mid"],
+["yi-sun-shin","Yi Sun-shin","marksman","jungle"],
+["yin","Yin","fighter","exp"],
+["yu-zhong","Yu Zhong","fighter","exp"],
+["yve","Yve","mage","mid"],
+["zetian","Zetian","mage","mid","new"],
+["zhask","Zhask","mage","mid"],
+["zhuxin","Zhuxin","mage","mid"],
+["zilong","Zilong","fighter","exp"]
+].map(h => ({slug:h[0], name:h[1], role:h[2], lane:h[3], isNew:h[4]==="new"}));
+
+const LANES = [
+  {v:"exp", label:"Exp Lane"},
+  {v:"mid", label:"Mid Lane"},
+  {v:"jungle", label:"Jungle"},
+  {v:"gold", label:"Gold Lane"},
+  {v:"roam", label:"Roam"}
+];
+const ROLES = [
+  {v:"tank", label:"Tank"},
+  {v:"fighter", label:"Fighter"},
+  {v:"assassin", label:"Assassin"},
+  {v:"mage", label:"Mage"},
+  {v:"marksman", label:"Marksman"},
+  {v:"support", label:"Support"}
+];
+const ROLE_COLOR = {
+  tank:"var(--tank)", fighter:"var(--fighter)", assassin:"var(--assassin)",
+  mage:"var(--mage)", marksman:"var(--marksman)", support:"var(--support)"
+};
+
+/* ---------------------------------------------------------
+   STATE + FILTER UI
+--------------------------------------------------------- */
+const state = { lanes:new Set(), roles:new Set() };
+
+const laneRow = document.getElementById('laneRow');
+const roleRow = document.getElementById('roleRow');
+
+function buildChip(container, group, value, label, roleColor){
+  const chip = document.createElement('button');
+  chip.className = 'chip';
+  chip.type = 'button';
+  chip.textContent = label;
+  chip.dataset.value = value;
+  if(roleColor){ chip.dataset.role=''; chip.style.setProperty('--role-color', roleColor); }
+  chip.addEventListener('click', () => {
+    if(value === 'all'){ state[group].clear(); }
+    else{
+      state[group].has(value) ? state[group].delete(value) : state[group].add(value);
+    }
+    refreshChips(container, group);
+    updatePool();
+  });
+  container.appendChild(chip);
+  return chip;
+}
+
+function refreshChips(container, group){
+  [...container.children].forEach(chip => {
+    const v = chip.dataset.value;
+    const isActive = v === 'all' ? state[group].size === 0 : state[group].has(v);
+    chip.classList.toggle('active', isActive);
+  });
+}
+
+buildChip(laneRow, 'lanes', 'all', 'All Lanes');
+LANES.forEach(l => buildChip(laneRow, 'lanes', l.v, l.label));
+refreshChips(laneRow, 'lanes');
+
+buildChip(roleRow, 'roles', 'all', 'All Roles');
+ROLES.forEach(r => buildChip(roleRow, 'roles', r.v, r.label, ROLE_COLOR[r.v]));
+refreshChips(roleRow, 'roles');
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  state.lanes.clear(); state.roles.clear();
+  refreshChips(laneRow, 'lanes'); refreshChips(roleRow, 'roles');
+  updatePool();
+});
+
+function getPool(){
+  return HEROES.filter(h =>
+    (state.lanes.size === 0 || state.lanes.has(h.lane)) &&
+    (state.roles.size === 0 || state.roles.has(h.role))
+  );
+}
+
+const poolCountEl = document.getElementById('poolCount');
+const emptyWarn = document.getElementById('emptyWarn');
+const spinBtn = document.getElementById('spinBtn');
+
+function updatePool(){
+  const pool = getPool();
+  poolCountEl.textContent = pool.length;
+  const empty = pool.length === 0;
+  emptyWarn.classList.toggle('show', empty);
+  spinBtn.disabled = empty || spinning;
+}
+
+/* ---------------------------------------------------------
+   PORTRAIT RENDERING (image w/ placeholder fallback)
+--------------------------------------------------------- */
+const heroImg = document.getElementById('heroImg');
+const heroFallback = document.getElementById('heroFallback');
+const portraitFrame = document.getElementById('portraitFrame');
+const idleHint = document.getElementById('idleHint');
+
+function initials(name){
+  return name.split(/[\s.'-]+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+}
+
+function paintPortrait(hero){
+  idleHint.style.display = 'none';
+  heroFallback.style.background = `linear-gradient(150deg, ${ROLE_COLOR[hero.role]}, #12151f 130%)`;
+  heroFallback.innerHTML = initials(hero.name) + `<small>${hero.name}</small>`;
+  heroImg.onerror = () => { heroImg.style.display='none'; heroFallback.style.display='flex'; };
+  heroImg.onload = () => { heroImg.style.display='block'; heroFallback.style.display='none'; };
+  heroImg.style.display = 'none';
+  heroFallback.style.display = 'flex';
+  heroImg.src = `images/${hero.slug}.jpg`;
+  heroImg.alt = hero.name;
+}
+
+/* ---------------------------------------------------------
+   RESULT + HISTORY
+--------------------------------------------------------- */
+const heroNameEl = document.getElementById('heroName');
+const heroTagsEl = document.getElementById('heroTags');
+const historyRow = document.getElementById('historyRow');
+const laneLabel = v => LANES.find(l=>l.v===v).label;
+const roleLabel = v => ROLES.find(r=>r.v===v).label;
+let history = [];
+
+function showResult(hero){
+  heroNameEl.innerHTML = (hero.isNew ? '<span class="new-badge">NEW</span><br>' : '') + hero.name;
+  heroTagsEl.innerHTML = `
+    <span class="tag" style="background:${ROLE_COLOR[hero.role]}">${roleLabel(hero.role)}</span>
+    <span class="tag lane">${laneLabel(hero.lane)}</span>
+  `;
+  portraitFrame.classList.add('reveal');
+  setTimeout(()=>portraitFrame.classList.remove('reveal'), 600);
+
+  history.unshift(hero);
+  history = history.slice(0, 10);
+  renderHistory();
+}
+
+function renderHistory(){
+  if(history.length === 0){
+    historyRow.innerHTML = '<span class="hist-empty">Your draw history will appear here</span>';
+    return;
+  }
+  historyRow.innerHTML = '';
+  history.forEach(hero => {
+    const item = document.createElement('div');
+    item.className = 'hist-item';
+    item.innerHTML = `
+      <div class="hist-portrait">
+        <img alt="">
+        <div class="hist-fallback" style="background:linear-gradient(150deg, ${ROLE_COLOR[hero.role]}, #12151f 130%)">${initials(hero.name)}</div>
+      </div>
+      <div class="hist-name">${hero.name}</div>
+    `;
+    const img = item.querySelector('img');
+    const fb = item.querySelector('.hist-fallback');
+    img.onerror = () => { img.style.display='none'; fb.style.display='flex'; };
+    img.onload = () => { img.style.display='block'; fb.style.display='none'; };
+    img.src = `images/${hero.slug}.jpg`;
+    historyRow.appendChild(item);
+  });
+}
+
+/* ---------------------------------------------------------
+   SPIN / DRAW LOGIC — blinking flicker through the pool
+--------------------------------------------------------- */
+let spinning = false;
+
+function spin(){
+  const pool = getPool();
+  if(pool.length === 0 || spinning) return;
+
+  spinning = true;
+  spinBtn.disabled = true;
+  heroTagsEl.innerHTML = '';
+  heroNameEl.textContent = 'Summoning…';
+
+  let ticks = 0;
+  const totalTicks = 22 + Math.floor(Math.random()*6);
+  let delay = 65;
+
+  function tick(){
+    const flicker = pool[Math.floor(Math.random()*pool.length)];
+    portraitFrame.classList.add('flash');
+    paintPortrait(flicker);
+    setTimeout(()=>portraitFrame.classList.remove('flash'), Math.max(30, delay*0.45));
+
+    ticks++;
+    if(ticks < totalTicks){
+      delay *= 1.11;
+      setTimeout(tick, delay);
+    } else {
+      const winner = pool[Math.floor(Math.random()*pool.length)];
+      paintPortrait(winner);
+      showResult(winner);
+      spinning = false;
+      updatePool();
+    }
+  }
+  tick();
+}
+
+spinBtn.addEventListener('click', spin);
+updatePool();
+</script>
+</body>
+</html>
