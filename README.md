@@ -14,7 +14,7 @@ A single-file, mobile-friendly web app that randomly draws a **Mobile Legends: B
 - **Filter by role** — Tank, Fighter, Assassin, Mage, Marksman, Support (multi-select)
 - **Animated draw** — the portrait flickers rapidly through the filtered pool, slowing down before landing on the pick
 - **Draw history** — last 10 picks shown as a scrollable strip
-- **130+ heroes**, roster current as of August 2026, including recent additions (Hirara, Marcel, Kalea, Sora, Obsidia, Zetian — flagged with a `NEW` badge)
+- **134 heroes**, roster current as of August 2026, including recent & upcoming additions (Hirara, Marcel, Kalea, Sora, Obsidia, Zetian, Collie — flagged with a `NEW` badge)
 - **Placeholder-first images** — every hero falls back to a generated initials badge until you drop in real artwork
 - Fully responsive, works on mobile out of the box
 - Zero dependencies beyond two Google Fonts
