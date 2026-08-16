@@ -143,7 +143,7 @@
     display:flex; align-items:center; justify-content:center;
   }
   .portrait-frame img{
-    width:100%; height:100%; object-fit:cover; display:none;
+    width:100%; height:100%; object-fit:cover; object-position:center 15%; display:none;
     transition:opacity .05s linear, filter .05s linear;
   }
   .fallback-avatar{
@@ -222,7 +222,7 @@
     background:radial-gradient(circle at 35% 25%, #262c40, #12151f 75%);
     display:flex; align-items:center; justify-content:center;
   }
-  .hist-portrait img{width:100%; height:100%; object-fit:cover; display:none;}
+  .hist-portrait img{width:100%; height:100%; object-fit:cover; object-position:center 15%; display:none;}
   .hist-fallback{
     width:100%; height:100%; display:flex; align-items:center; justify-content:center;
     font-family:'Cinzel',serif; font-weight:700; font-size:11px; color:#fff;
@@ -553,12 +553,27 @@ function paintPortrait(hero){
   idleHint.style.display = 'none';
   heroFallback.style.background = `linear-gradient(150deg, ${ROLE_COLOR[hero.role]}, #12151f 130%)`;
   heroFallback.innerHTML = initials(hero.name) + `<small>${hero.name}</small>`;
-  heroImg.onerror = () => { heroImg.style.display='none'; heroFallback.style.display='flex'; };
-  heroImg.onload = () => { heroImg.style.display='block'; heroFallback.style.display='none'; };
   heroImg.style.display = 'none';
   heroFallback.style.display = 'flex';
-  heroImg.src = `images/${hero.slug}.jpg`;
   heroImg.alt = hero.name;
+
+  const exts = ['png', 'jpg', 'webp'];
+  let idx = 0;
+  function tryLoad(){
+    if(idx < exts.length){
+      const ext = exts[idx++];
+      heroImg.onerror = tryLoad;
+      heroImg.onload = () => {
+        heroImg.style.display = 'block';
+        heroFallback.style.display = 'none';
+      };
+      heroImg.src = `images/${hero.slug}.${ext}`;
+    } else {
+      heroImg.style.display = 'none';
+      heroFallback.style.display = 'flex';
+    }
+  }
+  tryLoad();
 }
 
 /* ---------------------------------------------------------
@@ -603,9 +618,24 @@ function renderHistory(){
     `;
     const img = item.querySelector('img');
     const fb = item.querySelector('.hist-fallback');
-    img.onerror = () => { img.style.display='none'; fb.style.display='flex'; };
-    img.onload = () => { img.style.display='block'; fb.style.display='none'; };
-    img.src = `images/${hero.slug}.jpg`;
+    
+    const exts = ['png', 'jpg', 'webp'];
+    let idx = 0;
+    function tryLoadHist(){
+      if(idx < exts.length){
+        const ext = exts[idx++];
+        img.onerror = tryLoadHist;
+        img.onload = () => {
+          img.style.display = 'block';
+          fb.style.display = 'none';
+        };
+        img.src = `images/${hero.slug}.${ext}`;
+      } else {
+        img.style.display = 'none';
+        fb.style.display = 'flex';
+      }
+    }
+    tryLoadHist();
     historyRow.appendChild(item);
   });
 }
