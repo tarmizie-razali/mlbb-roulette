@@ -2,7 +2,7 @@
 
 A single-file, mobile-friendly web app that randomly draws a **Mobile Legends: Bang Bang** hero, filterable by **lane** or **role**. Built with plain HTML/CSS/JS — no build step, no dependencies.
 
-**🔗 Live site:** [mlbbroullete.tarmizierazali.my.id](https://mlbbroullete.tarmizierazali.my.id)
+**🔗 Live site:** [mlbbroullete.trtv.my.id](https://mlbbroullete.trtv.my.id)
 
 ![status](https://img.shields.io/badge/status-active-2bcf9e) ![type](https://img.shields.io/badge/stack-HTML%2FCSS%2FJS-cda45e)
 
@@ -69,7 +69,7 @@ Since it's a single static HTML file, it can be hosted anywhere that serves stat
 - **Netlify / Vercel / Cloudflare Pages** — drag-and-drop deploy or connect the repo.
 - **Any shared hosting / VPS** — upload `mlbb-hero-roulette.html` (renamed to `index.html` if desired) plus your `images/` folder.
 
-This project is currently deployed at **[mlbbroullete.tarmizierazali.my.id](https://mlbbroullete.tarmizierazali.my.id)**.
+This project is currently deployed at **[mlbbroullete.trtv.my.id](https://mlbbroullete.trtv.my.id)**.
 
 ---
 
